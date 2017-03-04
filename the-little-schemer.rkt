@@ -622,19 +622,19 @@
         (plus
           (value (1st-sub-exp nexp))
           (value (2st-sub-exp nexp))))
-      ((eq? (operator nexp) `-)
-        (minus
+      ((eq? (operator nexp) `x)
+        (multiply
           (value (1st-sub-exp nexp))
           (value (2st-sub-exp nexp))))
       (else
-        (multiply
+        (pow
           (value (1st-sub-exp nexp))
           (value (2st-sub-exp nexp)))))))
 
-(value `(+ 5 2))
-(value `(- 5 2))
-(value `(x 5 2))
-(value `(+ (x 3 6) (- 8 2)))
+(value `(+ 1 2)) ; 3
+(value `(x 3 6)) ; 18
+(value `(^ 8 2)) ; 64
+(value `(+ (x 3 6) (^ 8 2))) ;82
 
 ; ============================================================================
 
@@ -855,3 +855,180 @@
 (one-to-one? `((grape raisin)
                (plum prune)
                (stewed grape)))
+
+; ============================================================================
+; CHAPTER 8
+; ============================================================================
+
+(define rember-f
+  (lambda (test? a l)
+    (cond
+      ((null? l) `())
+      ((test? (car l) a) (cdr l))
+      (else
+        (cons
+          (car l)
+          (rember-f test? a (cdr l)))))))
+
+(rember-f = 5 `(6 2 5 3))
+(rember-f eq? `jelly `(jelly beans are good))
+(rember-f equal? `(pop corn) `(lemonade (pop corn) and (cake)))
+
+; ============================================================================
+
+(define rember-f2
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+        ((null? l) `())
+        ((test? (car l) a) (cdr l))
+        (else
+          (cons (car l)
+            ((rember-f2 test?) a
+             (cdr l))))))))
+
+((rember-f2 eq?) `tuna `(shrimp salad and tuna salad))
+((rember-f2 eq?) `eq? `(equal? eq? eqan? eqpair?))
+
+; ============================================================================
+
+(define insertL-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+        ((null? l) `())
+        ((test? (car l) old)
+          (cons new (cons old (cdr l))))
+        (else
+          (cons (car l)
+          ((insertL-f test?) new old (cdr l))))))))
+
+((insertL-f eq?) `topping `fudge `(ice cream with fudge for dessert))
+
+; ============================================================================
+
+(define insertR-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+        ((null? l) `())
+        ((test? (car l) old)
+          (cons old (cons new (cdr l))))
+        (else
+          (cons (car l)
+          ((insertR-f test?) new old (cdr l))))))))
+
+((insertR-f eq?) `topping `fudge `(ice cream with fudge for dessert))
+
+; ============================================================================
+
+(define seqR
+  (lambda (new old l)
+    (cons old (cons new l))))
+
+(define seqL
+  (lambda (new old l)
+    (cons new (cons old l))))
+
+(define insert-g
+  (lambda (seq)
+    (lambda (new old l)
+      (cond
+        ((null? l) `())
+        ((eq? (car l) old) (seq new old (cdr l)))
+        (else
+          (cons (car l)
+          ((insert-g seq) new old (cdr l))))))))
+
+((insert-g seqL) `topping `fudge `(ice cream with fudge for dessert))
+((insert-g seqR) `topping `fudge `(ice cream with fudge for dessert))
+
+; ============================================================================
+
+(define seqS
+  (lambda (new old l)
+    (cons new l)))
+
+(define subst3 (insert-g seqS))
+
+(subst3 `topping `fudge `(ice cream with fudge for dessert))
+
+; ============================================================================
+
+
+(define atom-to-function
+  (lambda (x)
+    (cond
+      ((eq? x `+) plus)
+      ((eq? x `x) multiply)
+      (else pow))))
+
+(define value2
+  (lambda (nexp)
+    (cond
+      ((atom? nexp) nexp)
+      (else
+        ((atom-to-function (operator nexp))
+          (value2 (1st-sub-exp nexp))
+          (value2 (2st-sub-exp nexp)))))))
+
+(value2 `(+ 1 2)) ; 3
+(value2 `(x 3 6)) ; 18
+(value2 `(^ 8 2)) ; 64
+(value2 `(+ (x 3 6) (^ 8 2))) ;82
+
+; ============================================================================
+
+(define multirember-f
+  (lambda (test?)
+    (lambda (a lat)
+      (cond
+        ((null? lat) `())
+        ((test? a (car lat))
+          ((multirember-f test?) a (cdr lat)))
+          (else
+            (cons (car lat)
+              ((multirember-f test?) a (cdr lat))))))))
+
+((multirember-f eq?) `tuna `(shrimp salad tuna salad and tuna))
+
+; ============================================================================
+
+(define multiremberT
+  (lambda (test? lat)
+    (cond
+      ((null? lat) `())
+      ((test? (car lat))
+      (multiremberT test? (cdr lat)))
+        (else
+          (cons
+            (car lat)
+            (multiremberT test? (cdr lat)))))))
+
+(define eq?-tuna
+  (lambda (a)
+    (eq? `tuna a)))
+
+(multiremberT eq?-tuna `(shrimp salad tuna salad and tuna))
+
+; ============================================================================
+
+(define even?
+  (lambda (n)
+    (= (multiply (divide n 2) 2) n)))
+
+(define evens-only* (lambda (l)
+  (cond
+    ((null? l) `())
+    ((atom? (car l))
+      (cond
+        ((even? (car l))
+          (cons (car l) (evens-only* (cdr l))))
+        (else
+          (evens-only* (cdr l)))))
+      (else
+        (cons
+          (evens-only* (car l))
+          (evens-only* (cdr l)))))))
+
+(evens-only*  `((9 1 28) 3 10 ((9 9) 76) 2))
