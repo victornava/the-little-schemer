@@ -30,7 +30,7 @@
 (define rember
   (lambda (a lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       ((eq? (car lat) a) (cdr lat))
       (else (cons (car lat)
               (rember a (cdr lat)))))))
@@ -43,7 +43,7 @@
 (define firsts
   (lambda (l)
     (cond
-      ((null? l) (quote ()))
+      ((null? l) `())
       (else (cons (car (car l))
               (firsts (cdr l)))))))
 
@@ -52,7 +52,7 @@
 (define insertR
   (lambda (new old lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else (cond
               ((eq? (car lat) old)
               (cons old
@@ -68,7 +68,7 @@
 (define insertL
   (lambda (new old lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else (cond
               ((eq? (car lat) old)
                (cons new lat))
@@ -83,7 +83,7 @@
 (define subst
   (lambda (new old lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else (cond
               ((eq? (car lat) old)
                (cons new (cdr lat)))
@@ -98,7 +98,7 @@
 (define subst2
   (lambda (new o1 o2 lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else (cond
                ((or (eq? (car lat) o1) (eq? (car lat) o2))
                 (cons new (cdr lat)))
@@ -113,7 +113,7 @@
 (define multirember
   (lambda (a lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else
         (cond
           ((eq? (car lat) a)
@@ -129,7 +129,7 @@
 (define multiinsertR
   (lambda (new old lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else (cond
               ((eq? (car lat) old)
                 (cons old
@@ -146,7 +146,7 @@
 (define multiinsertL
   (lambda (new old lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else (cond
               ((eq? (car lat) old)
                 (cons new
@@ -162,7 +162,7 @@
 (define multisubst
   (lambda (new old lat)
     (cond
-      ((null? lat) (quote ()))
+      ((null? lat) `())
       (else
         (cond
           ((eq? (car lat) old)
@@ -373,9 +373,7 @@
 
 (all-nums `(5 pears 6 prunes 9 dates)) ; -> (5 6 9)
 
-
 ; ============================================================================
-
 
 (define eqan?
   (lambda (a1 a2)
@@ -433,7 +431,7 @@
 (define rember*
   (lambda (a l)
     (cond
-      ((null? l) (quote ()))
+      ((null? l) `())
       ((atom? (car l))
         (cond
           ((eq? (car l) a)
@@ -453,7 +451,7 @@
 (define insertR*
   (lambda (new old l)
     (cond
-      ((null? l) (quote ()))
+      ((null? l) `())
       ((atom? (car l))
         (cond
           ((eq? (car l) old)
@@ -478,7 +476,7 @@
 (define subst*
   (lambda (new old l)
     (cond
-      ((null? l) (quote ()))
+      ((null? l) `())
       ((atom? (car l))
         (cond
           ((eq? (car l) old)
@@ -503,7 +501,7 @@
 (define insertL*
   (lambda (new old l)
     (cond
-      ((null? l) (quote ()))
+      ((null? l) `())
       ((atom? (car l))
         (cond
           ((eq? (car l) old)
@@ -1108,4 +1106,6 @@
      (food tastes good)))
   entry-not-found)
 
-; Fin
+; ============================================================================
+; FIN
+; ============================================================================
