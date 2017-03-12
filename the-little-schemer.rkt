@@ -1032,3 +1032,80 @@
           (evens-only* (cdr l)))))))
 
 (evens-only*  `((9 1 28) 3 10 ((9 9) 76) 2))
+
+; ============================================================================
+; CHAPTER 9
+; ============================================================================
+
+(define keep-looking
+  (lambda (a sorn lat)
+    (cond
+      ((number? sorn)
+        (keep-looking a (pick sorn lat) lat))
+      (else (eq? sorn a)))))
+
+(define looking
+  (lambda (a lat)
+    (keep-looking a (pick 1 lat) lat)))
+
+;(looking `caviar `(6 2 4 caviar 5 7 3))
+;(looking `caviar `(7 2 4 7 5 6 3))
+
+; Processing the rest...
+
+; ============================================================================
+; CHAPTER 10
+; ============================================================================
+
+(define lookup-in-entry-help
+  (lambda (name names values entry-f)
+    (cond
+      ((null? names) (entry-f name))
+      ((eq? (car names) name)
+        (car values))
+      (else
+      (lookup-in-entry-help
+        name (cdr names) (cdr values) entry-f)))))
+
+(define lookup-in-entry
+  (lambda (name entry entry-f)
+    (lookup-in-entry-help name
+      (first entry)
+      (second entry)
+      entry-f)))
+
+(define entry-not-found
+  (lambda (entry)
+  (cons entry `(not found))))
+
+
+(lookup-in-entry
+  `entree
+  `((appetizer entree beverage) (food tastes good))
+  entry-not-found)
+
+(lookup-in-entry
+  `dessert
+  `((appetizer entree beverage) (food tastes good))
+  entry-not-found)
+
+
+(define lookup-in-table
+  (lambda (name table table-f)
+    (cond
+      ((null? table) (table-f name))
+      (else (lookup-in-entry name
+        (car table)
+        (lambda (name)
+          (lookup-in-table name
+            (cdr table) table-f)))))))
+
+(lookup-in-table
+  `entrée
+  `(((entrée dessert)
+     (spaghetti spumoni))
+    ((appetizer entrée beverage)
+     (food tastes good)))
+  entry-not-found)
+
+; Fin
